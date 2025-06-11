@@ -1,33 +1,35 @@
-import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card"
-import { Button } from "./components/ui/button"
-import { Input } from "./components/ui/input"
-import { Badge } from "./components/ui/badge"
-import { Progress } from "./components/ui/progress"
-import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select"
-import { 
-  Search, 
-  Bell, 
-  Home, 
-  Users, 
-  FileText, 
-  BarChart3, 
-  Calendar, 
-  MessageSquare, 
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { Badge } from "./components/ui/badge";
+import { Progress } from "./components/ui/progress";
+import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select";
+import {
+  Search,
+  Bell,
+  Home,
+  Users,
+  FileText,
+  BarChart3,
+  Calendar,
+  MessageSquare,
   Settings,
   ChevronDown,
   MoreHorizontal,
-  Circle
-} from "lucide-react"
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis } from 'recharts'
+  Circle,
+  Menu
+} from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis } from 'recharts';
 
 const metricsData = [
   { title: "Total revenue", value: "$53,00889", icon: "💰", color: "bg-purple-100", iconBg: "bg-purple-500" },
   { title: "Total projects", value: "95", subtitle: "/100", icon: "📊", color: "bg-orange-100", iconBg: "bg-orange-500" },
   { title: "Total hour", value: "1022", subtitle: "/1200 hrs", icon: "⏰", color: "bg-blue-100", iconBg: "bg-blue-500" },
   { title: "Total team", value: "101", subtitle: "/120", icon: "👥", color: "bg-yellow-100", iconBg: "bg-yellow-500" }
-]
+];
 
 const projectData = [
   { name: "Character development", manager: "Nathaniel", date: "May 20, 2023", status: "In progress", progress: 85 },
@@ -35,12 +37,12 @@ const projectData = [
   { name: "Mobile phone branding", manager: "Timothy jonas", date: "July 15, 2023", status: "In progress", progress: 75 },
   { name: "Film and Entertainment", manager: "Marlee Harmony", date: "Dec 20, 2023", status: "Done", progress: 100 },
   { name: "Website builder development", manager: "Nathaniel Ray", date: "Nov 5, 2024", status: "In progress", progress: 45 }
-]
+];
 
 const pieChartData = [
   { name: "Progress", value: 72, fill: "#ff6b35" },
-  { name: "Remaining", value: 28, fill: "#e5e5eb" }
-]
+  { name: "Remaining", value: 28, fill: "#e5e7eb" }
+];
 
 const workloadData = [
   { day: "Mon", hours: 8 },
@@ -50,9 +52,10 @@ const workloadData = [
   { day: "Fri", hours: 5 },
   { day: "Sat", hours: 4 },
   { day: "Sun", hours: 3 }
-]
+];
 
-function App() {
+export default function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const sidebarItems = [
     { icon: Home, label: "Dashboard", active: true },
     { icon: FileText, label: "Projects" },
@@ -62,22 +65,29 @@ function App() {
     { icon: Users, label: "Users" },
     { icon: Settings, label: "Project settings" },
     { icon: MessageSquare, label: "Messaging" }
-  ]
+  ];
 
   return (
     <div className="flex h-screen bg-gray-50">
+      {/* Sidebar for desktop, overlay for mobile */}
+      {/* Overlay */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/40 transition-opacity md:hidden ${sidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => setSidebarOpen(false)}
+        aria-hidden={!sidebarOpen}
+      />
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900 text-white flex flex-col">
+      <aside
+        className={`fixed z-50 top-0 left-0 h-full w-64 bg-gray-900 text-white flex flex-col transform transition-transform duration-300 md:static md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
+        style={{ boxShadow: sidebarOpen ? '0 0 0 9999px rgba(0,0,0,0.4)' : undefined }}
+      >
         {/* Logo */}
-        <div className="p-6 border-b border-gray-800">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">P</span>
-            </div>
-            <span className="text-xl font-semibold">Promage</span>
+        <div className="p-6 border-b border-gray-800 flex items-center space-x-2">
+          <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">P</span>
           </div>
+          <span className="text-xl font-semibold">Promage</span>
         </div>
-
         {/* User Profile */}
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center space-x-3">
@@ -91,17 +101,16 @@ function App() {
             </div>
           </div>
         </div>
-
         {/* Navigation */}
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 p-4 overflow-y-auto">
           <ul className="space-y-2">
             {sidebarItems.map((item, index) => (
               <li key={index}>
-                <a 
-                  href="#" 
+                <a
+                  href="#"
                   className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                    item.active 
-                      ? 'bg-orange-500 text-white' 
+                    item.active
+                      ? 'bg-orange-500 text-white'
                       : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                   }`}
                 >
@@ -112,50 +121,55 @@ function App() {
             ))}
           </ul>
         </nav>
-      </div>
-
+      </aside>
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
+        <header className="bg-white border-b border-gray-200 px-4 py-4 flex items-center justify-between sticky top-0 z-30">
+          <div className="flex items-center space-x-4">
+            {/* Hamburger for mobile */}
+            <button
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open sidebar"
+            >
+              <Menu className="w-6 h-6 text-gray-700" />
+            </button>
             <div>
               <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
               <p className="text-sm text-gray-500 mt-1">Overview</p>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <Input 
-                  placeholder="Search for anything..." 
-                  className="pl-9 w-80 bg-gray-50 border-gray-200"
-                />
-              </div>
-              <Button variant="ghost" size="icon">
-                <Bell className="w-5 h-5" />
-              </Button>
-              <div className="flex items-center space-x-2">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src="/api/placeholder/32/32" />
-                  <AvatarFallback>AR</AvatarFallback>
-                </Avatar>
-                <span className="text-sm text-gray-700">Alex martin</span>
-                <ChevronDown className="w-4 h-4 text-gray-400" />
-              </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="Search for anything..."
+                className="pl-9 w-40 sm:w-80 bg-gray-50 border-gray-200"
+              />
+            </div>
+            <Button variant="ghost" size="icon">
+              <Bell className="w-5 h-5" />
+            </Button>
+            <div className="flex items-center space-x-2">
+              <Avatar className="w-8 h-8">
+                <AvatarImage src="/api/placeholder/32/32" />
+                <AvatarFallback>AR</AvatarFallback>
+              </Avatar>
+              <span className="text-sm text-gray-700 hidden sm:inline">Alex martin</span>
+              <ChevronDown className="w-4 h-4 text-gray-400 hidden sm:inline" />
             </div>
           </div>
         </header>
-
         {/* Dashboard Content */}
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-2 sm:p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Top right date indicator */}
             <div className="flex justify-end">
               <div className="text-sm text-gray-500">Last 30 days</div>
             </div>
-
             {/* Metrics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {metricsData.map((metric, index) => (
                 <Card key={index} className="border-0 shadow-sm">
                   <CardContent className="p-6">
@@ -177,7 +191,6 @@ function App() {
                 </Card>
               ))}
             </div>
-
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Project Summary Table */}
               <div className="lg:col-span-2">
@@ -233,7 +246,7 @@ function App() {
                             <TableCell className="text-sm text-gray-600">{project.manager}</TableCell>
                             <TableCell className="text-sm text-gray-600">{project.date}</TableCell>
                             <TableCell>
-                              <Badge 
+                              <Badge
                                 variant={project.status === 'Done' ? 'default' : project.status === 'Review' ? 'secondary' : 'outline'}
                                 className={`text-xs ${
                                   project.status === 'Done' ? 'bg-green-100 text-green-700 border-green-200' :
@@ -262,7 +275,6 @@ function App() {
                   </CardContent>
                 </Card>
               </div>
-
               {/* Right Side - Progress Chart */}
               <div className="space-y-6">
                 {/* Overall Progress */}
@@ -318,7 +330,6 @@ function App() {
                     </div>
                   </CardContent>
                 </Card>
-
                 {/* Project Workload */}
                 <Card className="border-0 shadow-sm">
                   <CardHeader>
@@ -339,7 +350,6 @@ function App() {
                 </Card>
               </div>
             </div>
-
             {/* Bottom Section - Today Task */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="border-0 shadow-sm">
@@ -368,8 +378,8 @@ function App() {
                         <span className={`text-sm flex-1 ${item.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-700'}`}>
                           {item.task}
                         </span>
-                        <Badge 
-                          variant="outline" 
+                        <Badge
+                          variant="outline"
                           className={`text-xs ${
                             item.priority === 'high' ? 'border-red-200 text-red-700 bg-red-50' :
                             item.priority === 'medium' ? 'border-orange-200 text-orange-700 bg-orange-50' :
@@ -383,7 +393,6 @@ function App() {
                   </div>
                 </CardContent>
               </Card>
-
               {/* Team Members Dots Display */}
               <Card className="border-0 shadow-sm">
                 <CardHeader>
@@ -392,8 +401,8 @@ function App() {
                 <CardContent>
                   <div className="grid grid-cols-7 gap-3">
                     {Array.from({ length: 35 }, (_, i) => (
-                      <div 
-                        key={i} 
+                      <div
+                        key={i}
                         className={`w-8 h-8 rounded-full ${
                           i % 5 === 0 ? 'bg-orange-500' :
                           i % 7 === 0 ? 'bg-gray-800' :
@@ -410,7 +419,5 @@ function App() {
         </main>
       </div>
     </div>
-  )
+  );
 }
-
-export default App
